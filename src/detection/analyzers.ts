@@ -107,35 +107,17 @@ export function analyzeCpp(code: string): CodeIssue[] {
     return issues;
 }
 
-// ── Router 
+// ── Router — language-specific pattern rules only ──────────────────────────────
+// Cross-language rules (bugLintRules, securityRules) are each given their
+// own dedicated parallel stage in engine/pipeline.ts.
 export function routeToAnalyzer(language: SupportedLanguage, code: string): CodeIssue[] {
-    let base: CodeIssue[] = [];
     switch (language) {
-        case "javascript": base = analyzeJavaScript(code); break;
-        case "typescript": base = analyzeTypeScript(code); break;
-        case "python": base = analyzePython(code); break;
-        case "java": base = analyzeJava(code); break;
-        case "c": base = analyzeC(code); break;
-        case "cpp": base = analyzeCpp(code); break;
+        case "javascript": return analyzeJavaScript(code);
+        case "typescript": return analyzeTypeScript(code);
+        case "python": return analyzePython(code);
+        case "java": return analyzeJava(code);
+        case "c": return analyzeC(code);
+        case "cpp": return analyzeCpp(code);
+        default: return [];
     }
-
-    // Rule modules loaded at runtime via require() to prevent tree-shaking.
-    const safeRun = (fn: unknown, ...args: unknown[]): CodeIssue[] => {
-        if (typeof fn !== "function") return [];
-        try { return (fn as (...a: unknown[]) => CodeIssue[])(...args) ?? []; }
-        catch { return []; }
-    };
-
-    /* eslint-disable @typescript-eslint/no-require-imports */
-    const bugLintFn = (require("./rules/bug-lint") as { bugLintRules: RuleFn }).bugLintRules;
-    const securityFn = (require("./rules/security") as { securityRules: RuleFn }).securityRules;
-    const complexFn = (require("./rules/complexity-rules") as { complexityRules: ComplexityFn }).complexityRules;
-    /* eslint-enable @typescript-eslint/no-require-imports */
-
-    return [
-        ...base,
-        ...safeRun(bugLintFn, code, language),
-        ...safeRun(securityFn, code, language),
-        ...safeRun(complexFn, code),
-    ];
 }

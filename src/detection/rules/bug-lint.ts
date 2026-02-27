@@ -57,6 +57,19 @@ export function bugLintRules(code: string, language: string): CodeIssue[] {
             });
         }
 
+        // ── Function called with literal null ────────────────────────────────
+        // e.g. printName(null) → warn that the callee may not handle null
+        if (/\b\w+\s*\(\s*null\s*\)/.test(t)) {
+            const fn = t.match(/\b(\w+)\s*\(\s*null\s*\)/)?.[1] ?? "function";
+            issues.push({
+                id: `bl-nullcall-${ln}`,
+                category: "bug", severity: "error",
+                message: `Passing literal 'null' to '${fn}()' — the function may dereference it without a null check.`,
+                line: ln,
+                suggestion: `Add a null guard inside '${fn}': if (!param) return; or use optional chaining.`,
+            });
+        }
+
         void t; void language;
     });
 

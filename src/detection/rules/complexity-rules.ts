@@ -35,5 +35,36 @@ export function complexityRules(code: string, threshold = 10): CodeIssue[] {
         });
     }
 
+    // ── Function length > 50 lines ──
+    const fnRegex = /\bfunction\s+\w*\s*\([^)]*\)\s*\{/g;
+    let match: RegExpExecArray | null;
+    while ((match = fnRegex.exec(code)) !== null) {
+        const startLine = code.slice(0, match.index).split("\n").length;
+        // Walk forward to find the closing brace
+        let depth = 0;
+        let endLine = startLine;
+        for (let j = match.index; j < code.length; j++) {
+            if (code[j] === "{") depth++;
+            else if (code[j] === "}") {
+                depth--;
+                if (depth === 0) {
+                    endLine = code.slice(0, j).split("\n").length;
+                    break;
+                }
+            }
+        }
+        const fnLines = endLine - startLine + 1;
+        if (fnLines > 50) {
+            issues.push({
+                id: `cplx-fnlen-L${startLine}`,
+                category: "complexity", severity: "warning",
+                message: `Function is ${fnLines} lines long (recommended max: 50). Long functions are hard to test and maintain.`,
+                line: startLine,
+                suggestion: "Break this function into smaller, focused helper functions.",
+            });
+        }
+    }
+
     return issues;
 }
+

@@ -6,6 +6,19 @@ import { analyzeRedundancy } from "./redundancy/redundancy";
 import { detectLanguage, routeToAnalyzer, DEFAULT_WEIGHTS } from "./detection/index";
 import type { AnalysisReport, AnalysisWeights } from "./detection/types";
 
+//pipeline (full multi-stage async analysis) 
+export { analyze } from "./engine/pipeline";
+export type { PipelineReport, PipelineOptions, DiffResult, PipelineSnapshot } from "./engine/types";
+
+// ── Reviewer api — reviewer.config() with custom weights 
+export { reviewer } from "./engine/reviewer";
+export type { Reviewer, ReviewerConfig, ReviewerWeights, ReviewOptions } from "./engine/reviewer";
+
+
+// bug & lint+ security rule functions  
+export { bugLintRules } from "./detection/rules/bug-lint";
+export { securityRules } from "./detection/rules/security";
+
 // ── Re-export detection module (Language Detection) 
 export {
   detectLanguage,
@@ -48,19 +61,15 @@ export function analyzeFile(
 ): AnalysisReport {
   const { filename, weights: weightOverrides } = options;
 
-  //detect language
   const detection = detectLanguage(code, filename);
 
-  // route to per-language analyzer (only when language is known)
   const issues =
     detection.language !== "unknown"
       ? routeToAnalyzer(detection.language as import("./detection/types").SupportedLanguage, code)
       : [];
 
-  // merge weights
   const weights: AnalysisWeights = { ...DEFAULT_WEIGHTS, ...weightOverrides };
 
-  // compute penalty breakdown & overall score
   const countBySeverity = (cat: string, sev: string) =>
     issues.filter((i) => i.category === cat && i.severity === sev).length;
 
@@ -85,7 +94,6 @@ export function analyzeFile(
   return { detection, issues, score, weights, penaltyBreakdown };
 }
 
-//combined analyze() — runs complexity + redundancy modules 
 export async function analyzeCode(code: string): Promise<Report> {
   const complexityResult = analyzeComplexity(code);
   const redundancyResult = analyzeRedundancy(code);
@@ -95,7 +103,6 @@ export async function analyzeCode(code: string): Promise<Report> {
   };
 }
 
-// ── Utilities 
 export function version() {
   return "1.0.0";
 }

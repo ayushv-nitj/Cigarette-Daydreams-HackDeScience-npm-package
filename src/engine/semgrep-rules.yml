@@ -1,0 +1,277 @@
+# Semgrep rules bundled with the pipeline — no cloud login required.
+# These cover the most impactful security + bug patterns across all 6 supported languages.
+# Loaded via: semgrep --json --config=<path-to-this-file>
+
+rules:
+
+  # ═══════════════════════════════════════════════════════
+  # JAVASCRIPT / TYPESCRIPT
+  # ═══════════════════════════════════════════════════════
+
+  - id: js-eval-usage
+    patterns:
+      - pattern: eval(...)
+    message: "eval() allows arbitrary code execution. Never use eval() with user-controlled input."
+    languages: [javascript, typescript]
+    severity: ERROR
+    metadata:
+      category: security
+      cwe: "CWE-95: Eval Injection"
+
+  - id: js-function-constructor
+    patterns:
+      - pattern: new Function(...)
+    message: "new Function() is equivalent to eval() — arbitrary code execution risk."
+    languages: [javascript, typescript]
+    severity: ERROR
+    metadata:
+      category: security
+
+  - id: js-inner-html
+    patterns:
+      - pattern: $EL.innerHTML = $VAL
+    message: "Setting innerHTML with dynamic content can cause XSS. Use textContent or DOMPurify."
+    languages: [javascript, typescript]
+    severity: ERROR
+    metadata:
+      category: security
+      cwe: "CWE-79: XSS"
+
+  - id: js-outer-html
+    patterns:
+      - pattern: $EL.outerHTML = $VAL
+    message: "Setting outerHTML with dynamic content can cause XSS."
+    languages: [javascript, typescript]
+    severity: ERROR
+    metadata:
+      category: security
+
+  - id: js-document-write
+    patterns:
+      - pattern: document.write(...)
+    message: "document.write() can lead to XSS and blocks parser. Use DOM APIs instead."
+    languages: [javascript, typescript]
+    severity: WARNING
+    metadata:
+      category: security
+
+  - id: js-loose-equality-null
+    patterns:
+      - pattern: $X == null
+    message: "Use strict equality '=== null' or nullish check to avoid type coercion with undefined."
+    languages: [javascript, typescript]
+    severity: WARNING
+    metadata:
+      category: bug
+
+  - id: js-prototype-pollution
+    patterns:
+      - pattern: Object.assign($A, $X)
+      - pattern: $A.__proto__ = $X
+    message: "Possible prototype pollution — validate that $X does not contain __proto__ or constructor."
+    languages: [javascript, typescript]
+    severity: WARNING
+    metadata:
+      category: security
+
+  - id: js-console-in-prod
+    patterns:
+      - pattern: console.log(...)
+      - pattern: console.warn(...)
+      - pattern: console.error(...)
+    message: "Remove console statements before production — use a structured logger."
+    languages: [javascript, typescript]
+    severity: INFO
+    metadata:
+      category: style
+
+  - id: js-hardcoded-secret
+    patterns:
+      - pattern: |
+          const $VAR = "$VAL"
+      - metavariable-regex:
+          metavariable: $VAR
+          regex: .*(password|passwd|secret|api_key|apikey|token|auth_token|private_key).*
+    message: "Hardcoded credential in '$VAR'. Use environment variables instead (process.env.MY_SECRET)."
+    languages: [javascript, typescript]
+    severity: ERROR
+    metadata:
+      category: security
+      cwe: "CWE-798: Use of Hard-coded Credentials"
+
+  - id: js-hardcoded-secret-var
+    patterns:
+      - pattern: |
+          var $VAR = "$VAL"
+      - metavariable-regex:
+          metavariable: $VAR
+          regex: .*(password|passwd|secret|api_key|apikey|token|auth_token).*
+    message: "Hardcoded credential in '$VAR'. Use environment variables instead."
+    languages: [javascript, typescript]
+    severity: ERROR
+    metadata:
+      category: security
+
+  - id: js-sql-concat
+    patterns:
+      - pattern: $Q + $REQ.body.$F
+      - pattern: $Q + $REQ.params.$F
+      - pattern: $Q + $REQ.query.$F
+    message: "Possible SQL injection — user input concatenated into query. Use parameterized queries."
+    languages: [javascript, typescript]
+    severity: ERROR
+    metadata:
+      category: security
+      cwe: "CWE-89: SQL Injection"
+
+  # ═══════════════════════════════════════════════════════
+  # PYTHON
+  # ═══════════════════════════════════════════════════════
+
+  - id: py-eval-usage
+    patterns:
+      - pattern: eval(...)
+    message: "eval() is dangerous in Python. Use ast.literal_eval() for safe literal parsing."
+    languages: [python]
+    severity: ERROR
+    metadata:
+      category: security
+
+  - id: py-exec-usage
+    patterns:
+      - pattern: exec(...)
+    message: "exec() executes arbitrary Python code. Avoid with user-controlled input."
+    languages: [python]
+    severity: ERROR
+    metadata:
+      category: security
+
+  - id: py-shell-true
+    patterns:
+      - pattern: subprocess.$FN(..., shell=True, ...)
+    message: "subprocess with shell=True is vulnerable to shell injection. Use shell=False with a list."
+    languages: [python]
+    severity: ERROR
+    metadata:
+      category: security
+      cwe: "CWE-78: OS Command Injection"
+
+  - id: py-os-system
+    patterns:
+      - pattern: os.system($CMD)
+    message: "os.system() passes the command to a shell — vulnerable to command injection."
+    languages: [python]
+    severity: WARNING
+    metadata:
+      category: security
+
+  - id: py-bare-except
+    patterns:
+      - pattern: |
+          try:
+            ...
+          except:
+            ...
+    message: "Bare except: catches all exceptions including SystemExit/KeyboardInterrupt. Use 'except Exception'."
+    languages: [python]
+    severity: WARNING
+    metadata:
+      category: bug
+
+  - id: py-hardcoded-secret
+    patterns:
+      - pattern: $VAR = "$VAL"
+      - metavariable-regex:
+          metavariable: $VAR
+          regex: .*(password|passwd|secret|api_key|apikey|token|auth_token).*
+    message: "Hardcoded credential in '$VAR'. Use environment variables (os.environ['MY_SECRET'])."
+    languages: [python]
+    severity: ERROR
+    metadata:
+      category: security
+
+  - id: py-pickle-loads
+    patterns:
+      - pattern: pickle.loads($DATA)
+    message: "pickle.loads() with untrusted data allows arbitrary code execution. Use JSON instead."
+    languages: [python]
+    severity: ERROR
+    metadata:
+      category: security
+
+  # ═══════════════════════════════════════════════════════
+  # JAVA
+  # ═══════════════════════════════════════════════════════
+
+  - id: java-sql-concat
+    patterns:
+      - pattern: $STMT.executeQuery($Q + ...)
+      - pattern: $STMT.execute($Q + ...)
+    message: "Possible SQL injection — query string concatenation detected. Use PreparedStatement."
+    languages: [java]
+    severity: ERROR
+    metadata:
+      category: security
+      cwe: "CWE-89: SQL Injection"
+
+  - id: java-system-exit
+    patterns:
+      - pattern: System.exit($CODE)
+    message: "System.exit() shuts down the JVM — avoid in library/web code."
+    languages: [java]
+    severity: WARNING
+    metadata:
+      category: bug
+
+  - id: java-catch-throwable
+    patterns:
+      - pattern: |
+          catch (Throwable $E) { ... }
+    message: "Catching Throwable includes Errors (OutOfMemory etc.). Catch Exception instead."
+    languages: [java]
+    severity: WARNING
+    metadata:
+      category: bug
+
+  # ═══════════════════════════════════════════════════════
+  # C / C++
+  # ═══════════════════════════════════════════════════════
+
+  - id: c-gets-usage
+    patterns:
+      - pattern: gets($BUF)
+    message: "gets() has no bounds checking — always leads to buffer overflow. Use fgets()."
+    languages: [c, cpp]
+    severity: ERROR
+    metadata:
+      category: security
+      cwe: "CWE-120: Buffer Overflow"
+
+  - id: c-strcpy-usage
+    patterns:
+      - pattern: strcpy($DST, $SRC)
+    message: "strcpy() may overflow destination buffer. Use strncpy() or strlcpy()."
+    languages: [c, cpp]
+    severity: WARNING
+    metadata:
+      category: security
+
+  - id: c-sprintf-usage
+    patterns:
+      - pattern: sprintf($BUF, $FMT, ...)
+    message: "sprintf() may overflow buffer. Use snprintf() with an explicit size."
+    languages: [c, cpp]
+    severity: WARNING
+    metadata:
+      category: security
+
+  - id: c-format-string
+    patterns:
+      - pattern: printf($VAR)
+      - pattern: fprintf($FD, $VAR)
+    message: "Format string vulnerability — always use a format literal: printf(\"%s\", str)."
+    languages: [c, cpp]
+    severity: ERROR
+    metadata:
+      category: security
+      cwe: "CWE-134: Format String Vulnerability"

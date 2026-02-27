@@ -16,7 +16,7 @@ export type IssueCategory = "bug" | "security" | "complexity" | "style" | "redun
 
 export interface DetectionResult {
     language: SupportedLanguage | "unknown";
-    confidence: number; // 0.0 – 1.0
+    confidence: number;
     method: DetectionMethod;
 }
 

@@ -6,7 +6,7 @@
   "types": "dist/index.d.ts",
   "type": "commonjs",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && mkdir -p src/dist/engine && cp src/engine/semgrep-rules.yml src/dist/engine/semgrep-rules.yml",
     "test": "node src/test/detection.test.js"
   },
   "repository": {
