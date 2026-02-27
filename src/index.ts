@@ -1,52 +1,40 @@
-export interface AnalyzeOptions {
-  language?: string;
+import { analyzeComplexity } from "./complexity/complexity";
+import { analyzeRedundancy } from "./redundancy/redundancy";
+import fs from "fs";
+
+export interface FunctionComplexity {
+  name: string;
+  line: number;
+  cyclomaticComplexity: number;
+  length: number;
+  nestingDepth: number;
+  warnings: string[];
 }
 
-export interface Issue {
-  type: "bug" | "lint" | "security";
-  message: string;
+export interface RedundancyItem {
+  name: string;
   line: number;
-  column: number;
-  severity: "info" | "warning" | "error" | "critical";
-  suggestion?: string;
+  duplicateOf: string;
 }
 
 export interface Report {
-  language: string;
-  confidence: number;
-  score: number;
-  grade: string;
-  bugs: Issue[];
-  lint: Issue[];
-  security: Issue[];
-  complexity: any[];
-  redundancy: any[];
-  suggestions: string[];
-  formatted: string;
-  diff: string;
+  complexity: FunctionComplexity[];
+  redundancy: RedundancyItem[];
 }
 
-function analyze(code: string, options?: AnalyzeOptions): Report {
+async function analyze(code: string): Promise<Report> {
+  const complexityResult = analyzeComplexity(code);
+  const redundancyResult = analyzeRedundancy(code);
+
   return {
-    language: "unknown",
-    confidence: 0,
-    score: 100,
-    grade: "A",
-    bugs: [],
-    lint: [],
-    security: [],
-    complexity: [],
-    redundancy: [],
-    suggestions: [],
-    formatted: code,
-    diff: ""
+    complexity: complexityResult.functions,
+    redundancy: redundancyResult.duplicates
   };
 }
 
-function analyzeFile(path: string, options?: AnalyzeOptions): Report {
-  const fs = require("fs");
+async function analyzeFile(path: string): Promise<Report> {
   const code = fs.readFileSync(path, "utf-8");
-  return analyze(code, options);
+  return analyze(code);
 }
 
 function diff(oldCode: string, newCode: string) {
@@ -60,11 +48,11 @@ function version() {
 }
 
 function supportedLanguages() {
-  return ["javascript", "typescript", "python", "java"];
+  return ["javascript", "typescript"];
 }
 
 function config() {
-  // placeholder
+  // teammate will implement scoring config
 }
 
 export default {

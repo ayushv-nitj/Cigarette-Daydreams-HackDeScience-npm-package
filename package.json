@@ -17,8 +17,13 @@
     "dist"
   ],
   "devDependencies": {
-    "typescript": "^5.9.3",
+    "@types/babel__traverse": "^7.28.0",
+    "@types/node": "^25.3.2",
     "ts-node": "^10.9.2",
-    "@types/node": "^25.3.2"
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@babel/parser": "^7.29.0",
+    "@babel/traverse": "^7.29.0"
   }
 }
