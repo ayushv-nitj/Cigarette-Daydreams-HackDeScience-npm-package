@@ -1,4 +1,4 @@
-// types.ts — Shared TypeScript types for the language detection module
+//Shared TypeScript types for the language detection module
 
 export type SupportedLanguage =
     | "javascript"
@@ -31,15 +31,12 @@ export interface CodeIssue {
 }
 
 export interface AnalysisWeights {
-    /** Weight for bug penalties (w_bug). Default: 0.35 */
+    //default values added in excaldraw
+
     bug: number;
-    /** Weight for security penalties (w_sec). Default: 0.30 */
     security: number;
-    /** Weight for complexity penalties (w_cplx). Default: 0.15 */
     complexity: number;
-    /** Weight for redundancy penalties (w_red). Default: 0.10 */
     redundancy: number;
-    /** Weight for style/lint penalties (w_lint). Default: 0.10 */
     style: number;
 }
 
@@ -50,7 +47,7 @@ export interface AnalysisConfig {
 export interface AnalysisReport {
     detection: DetectionResult;
     issues: CodeIssue[];
-    // overall quality score
+    // finally calculating overall quality score
     score: number;
     weights: AnalysisWeights;
     penaltyBreakdown: {
