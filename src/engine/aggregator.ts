@@ -20,6 +20,30 @@ function deduplicate(issues: CodeIssue[]): CodeIssue[] {
     });
 }
 
+/**
+ * Smarter dedup for security issues.
+ * Semgrep is authoritative — if it already flagged a line, suppress any
+ * regex-based securityRules finding on the same line to avoid duplicates.
+ * OSV findings (no line number) are always kept.
+ */
+function deduplicateSecurity(
+    semgrep: CodeIssue[],
+    osv: CodeIssue[],
+    regexSecurity: CodeIssue[]
+): CodeIssue[] {
+    // Lines already covered by Semgrep
+    const semgrepLines = new Set<number>(
+        semgrep.filter(i => i.line !== undefined).map(i => i.line!)
+    );
+
+    // Only keep regex security issues on lines NOT already covered by Semgrep
+    const filteredRegex = regexSecurity.filter(
+        i => i.line === undefined || !semgrepLines.has(i.line)
+    );
+
+    return deduplicate([...semgrep, ...osv, ...filteredRegex]);
+}
+
 /** Safe value extractor from StageResult */
 function getValue<T>(result: StageResult | undefined, fallback: T): T {
     if (!result || result.status !== "fulfilled") return fallback;
@@ -74,10 +98,10 @@ export function aggregate(results: StageResult[]): AggregatedResult {
 
     //Collect issues from each engine  
     const bugLintEngineIssues = getValue<CodeIssue[]>(byLabel.get("bugLintEngine"), []);
-    const securityRulesIssues = getValue<CodeIssue[]>(byLabel.get("securityRules"), []);
     const semgrepIssues = getValue<CodeIssue[]>(byLabel.get("semgrepEngine"), []);
-    const osvIssues = getValue<CodeIssue[]>(byLabel.get("osvEngine"), []);
+    const teamSecurityIssues = getValue<CodeIssue[]>(byLabel.get("teamSecurityEngine"), []);
     const baseAnalyzerIssues = getValue<CodeIssue[]>(byLabel.get("baseAnalyzer"), []);
+
 
     // Real AST complexity output  
     const complexityResult = getValue<{ functions: FunctionComplexity[] }>(
@@ -119,18 +143,15 @@ export function aggregate(results: StageResult[]): AggregatedResult {
     const allIssues = deduplicate([
         ...baseAnalyzerIssues,
         ...bugLintEngineIssues,
-        ...securityRulesIssues,
         ...complexityIssues,
         ...redundancyIssues,
     ]);
 
+    // ── Security issues: Semgrep (authoritative) > teammate's full engine ──
+    // teamSecurityEngine = scanFile() + scanDependencies() → all in one
+    // Semgrep wins on same-line collisions (suppresses teamSec on same line)
+    const securityIssues = deduplicateSecurity(semgrepIssues, [], teamSecurityIssues);
 
-    // ── Separate security issues  ──
-    const securityIssues = deduplicate([
-        ...semgrepIssues,
-        ...osvIssues,
-        ...allIssues.filter((i) => i.category === "security"),
-    ]);
 
     const nonSecurityIssues = allIssues.filter((i) => i.category !== "security");
 

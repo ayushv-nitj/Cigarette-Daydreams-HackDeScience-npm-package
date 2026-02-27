@@ -1,0 +1,53 @@
+
+================ NORMAL OSV CHECK ================
+
+[
+  {
+    "rule": "SQL_INJECTION",
+    "file": "test-c-bad.c",
+    "line": 12,
+    "severity": "high",
+    "message": "Possible SQL injection.",
+    "remediation": "Use parameterized queries or prepared statements."
+  },
+  {
+    "rule": "SQL_INJECTION",
+    "file": "test-c-bad.c",
+    "line": 13,
+    "severity": "high",
+    "message": "Possible SQL injection.",
+    "remediation": "Use parameterized queries or prepared statements."
+  },
+  {
+    "rule": "SQL_INJECTION",
+    "file": "test-c-bad.c",
+    "line": 22,
+    "severity": "high",
+    "message": "Possible SQL injection.",
+    "remediation": "Use parameterized queries or prepared statements."
+  },
+  {
+    "rule": "SQL_INJECTION",
+    "file": "test-c-bad.c",
+    "line": 41,
+    "severity": "high",
+    "message": "Possible SQL injection.",
+    "remediation": "Use parameterized queries or prepared statements."
+  },
+  {
+    "rule": "HARDCODED_SECRET",
+    "file": "test-c-bad.c",
+    "line": 48,
+    "severity": "critical",
+    "message": "Hardcoded API key detected.",
+    "remediation": "Move to environment variable."
+  },
+  {
+    "rule": "PATH_TRAVERSAL",
+    "file": "test-c-bad.c",
+    "line": 71,
+    "severity": "high",
+    "message": "Possible path traversal vulnerability.",
+    "remediation": "Validate and sanitize file paths. Avoid using '../' in dynamic file access."
+  }
+]

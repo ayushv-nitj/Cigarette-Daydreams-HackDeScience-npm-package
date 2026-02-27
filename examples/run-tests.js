@@ -2,7 +2,8 @@
 // Usage: node examples/run-tests.js  (from project root, after npm run build)
 
 const path = require("path");
-const { analyze } = require(path.join(__dirname, "../src/dist/index.js"));
+const { analyze } = require(path.join(__dirname, "../dist/index.js"));
+
 
 const FILENAME = "test-cases.js";
 

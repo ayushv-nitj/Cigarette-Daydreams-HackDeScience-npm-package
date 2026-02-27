@@ -1,0 +1,61 @@
+
+[1m════════════════════════════════════════════════════════════════════
+  🔍 Analyzing: index.ts
+════════════════════════════════════════════════════════════════════[0m
+[2m  ┌─ code preview ───────────────────────────────────────────────────
+  │  // src/index.ts — Main entry point for the npm package
+  │  // Merges: complexity (Ayush) + redundancy (teammate) + detection (Shanawaz) + formatting & diff module
+  │  
+  │  import { analyzeComplexity } from "./complexity/complexity";
+  │  import { analyzeRedundancy } from "./redundancy/redundancy";
+  │  import { detectLanguage, routeToAnalyzer, DEFAULT_WEIGHTS } from "./detection/index";
+  │  … +278 more lines
+  └──────────────────────────────────────────────────────────────────[0m
+
+  [1mScore   : [32m93.5%[0m
+  Language: typescript  (method: extension, conf: 1.00)
+
+────────────────────────────────────────────────────────────────────
+[1m  ISSUES (4):[0m
+  [33m[warning][0m [bug        ] L139  Unreachable code — statements after return/break/throw are never executed.
+  [2m           💡  Remove or relocate the unreachable code.[0m
+  [33m[warning][0m [bug        ] L165  Unreachable code — statements after return/break/throw are never executed.
+  [2m           💡  Remove or relocate the unreachable code.[0m
+  [33m[warning][0m [bug        ] L255  Unreachable code — statements after return/break/throw are never executed.
+  [2m           💡  Remove or relocate the unreachable code.[0m
+  [33m[warning][0m [complexity ] L112  Function 'format': Function too long (>50 lines) (cyclomatic: 4, lines: 64, nesting: 1)
+  [2m           💡  Refactor into smaller, focused functions.[0m
+
+────────────────────────────────────────────────────────────────────
+[1m  COMPLEXITY FUNCTIONS (10):[0m
+  ✓ detectLanguageFromExtensionL104  cyclomatic:2  lines:4  nesting:0
+  ⚠ format                L112  cyclomatic:4  lines:64  nesting:1[33m  ⚠ Function too long (>50 lines)[0m
+  ✓ formatFile            L180  cyclomatic:6  lines:25  nesting:1
+  ✓ analyzeFile           L209  cyclomatic:2  lines:38  nesting:0
+  ✓ countBySeverity       L224  cyclomatic:2  lines:2  nesting:0
+  ✓ anonymous             L225  cyclomatic:2  lines:1  nesting:0
+  ✓ analyzeCode           L251  cyclomatic:1  lines:8  nesting:0
+  ✓ version               L264  cyclomatic:1  lines:3  nesting:0
+  ✓ supportedLanguages    L268  cyclomatic:1  lines:3  nesting:0
+  ✓ diff                  L272  cyclomatic:1  lines:3  nesting:0
+
+────────────────────────────────────────────────────────────────────
+[1m  PENALTY BREAKDOWN:[0m
+  bug          █████ 15.0%
+  security      0.0%
+  complexity   ██ 8.0%
+  redundancy    0.0%
+  style         0.0%
+
+────────────────────────────────────────────────────────────────────
+[1m  STAGE TIMING:[0m
+  baseAnalyzer          [2m31ms[0m
+  bugLintEngine         [2m31ms[0m
+  semgrepEngine         [2m1956ms[0m
+  teamSecurityEngine    [2m31ms[0m
+  complexityEngine      [2m31ms[0m
+  redundancyEngine      [2m31ms[0m
+  formatter             [2m31ms[0m
+
+[1m════════════════════════════════════════════════════════════════════[0m
+

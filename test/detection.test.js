@@ -84,7 +84,7 @@ for (const { label, expected, code } of syntaxCases) {
     assert(`syntax: ${label} conf ≤ 0.9`, d.confidence <= 0.9, true);
 }
 
-console.log("\n── Edge Cases ───────────────────────────────────────────────────");
+console.log("\n── Edge Cases  ───────");
 assert("empty file → unknown", detectLanguage("").language, "unknown");
 assert("empty confidence = 0", detectLanguage("").confidence, 0);
 assert("ext beats syntax (ts file)",

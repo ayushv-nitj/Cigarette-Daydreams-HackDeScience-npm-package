@@ -1,0 +1,766 @@
+
+════════════════════════════════════════════════════════════
+  Test 1 — Null Dereference
+  Expected : bug/warning: null dereference on user.name
+  Score    : 94.8%   Issues found: 1
+────────────────────────────────────────────────────────────
+{
+  "file": "test-cases.js",
+  "line": 4,
+  "column": null,
+  "type": "bug",
+  "severity": "error",
+  "message": "Passing literal 'null' to 'printName()' — the function may dereference it without a null check.",
+  "fix": "Add a null guard inside 'printName': if (!param) return; or use optional chaining."
+}
+
+════════════════════════════════════════════════════════════
+  Test 2 — Off-by-One Error
+  Expected : bug/warning: i <= arr.length
+  Score    : 98.2%   Issues found: 2
+────────────────────────────────────────────────────────────
+{
+  "file": "test-cases.js",
+  "line": 3,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 2,
+  "column": null,
+  "type": "bug",
+  "severity": "warning",
+  "message": "Possible off-by-one: using '<= .length' — array index is 0-based, last valid index is length-1.",
+  "fix": "Use '< arr.length' instead of '<= arr.length'."
+}
+
+════════════════════════════════════════════════════════════
+  Test 3 — Unreachable Code
+  Expected : bug/warning: code after return
+  Score    : 96.4%   Issues found: 3
+────────────────────────────────────────────────────────────
+{
+  "file": "test-cases.js",
+  "line": 3,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 3,
+  "column": null,
+  "type": "bug",
+  "severity": "warning",
+  "message": "Unreachable code — statements after 'return' are never executed.",
+  "fix": "Remove or relocate the unreachable statements."
+}
+{
+  "file": "test-cases.js",
+  "line": 3,
+  "column": 1,
+  "type": "bug",
+  "severity": "warning",
+  "message": "Unreachable code — statements after return/break/throw are never executed.",
+  "fix": "Remove or relocate the unreachable code."
+}
+
+════════════════════════════════════════════════════════════
+  Test 4 — Unused Variable
+  Expected : lint/warning: result declared but never used
+  Score    : 98.3%   Issues found: 1
+────────────────────────────────────────────────────────────
+{
+  "file": "test-cases.js",
+  "line": 2,
+  "column": null,
+  "type": "bug",
+  "severity": "warning",
+  "message": "Variable 'result' is declared but never used.",
+  "fix": "Remove 'result' or prefix with '_' to suppress this warning."
+}
+
+════════════════════════════════════════════════════════════
+  Test 5 — Shadowed Declaration
+  Expected : lint/warning: inner count shadows outer count
+  Score    : 98.2%   Issues found: 2
+────────────────────────────────────────────────────────────
+{
+  "file": "test-cases.js",
+  "line": 4,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 3,
+  "column": null,
+  "type": "bug",
+  "severity": "warning",
+  "message": "Variable 'count' shadows a declaration in an outer scope.",
+  "fix": "Rename 'count' to avoid shadowing."
+}
+
+════════════════════════════════════════════════════════════
+  Test 6 — Incorrect Type Coercion
+  Expected : lint/warning: use === not ==
+  Score    : 96.4%   Issues found: 3
+────────────────────────────────────────────────────────────
+{
+  "file": "test-cases.js",
+  "line": 1,
+  "column": null,
+  "type": "bug",
+  "severity": "warning",
+  "message": "Use === instead of ==.",
+  "fix": "Replace == with ==="
+}
+{
+  "file": "test-cases.js",
+  "line": 2,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 1,
+  "column": null,
+  "type": "bug",
+  "severity": "warning",
+  "message": "Use '===' instead of '==' to avoid type coercion bugs.",
+  "fix": "Replace '==' with '==='"
+}
+
+════════════════════════════════════════════════════════════
+  Test 7 — Naming Convention
+  Expected : lint/info: user_name violates camelCase
+  Score    : 99.8%   Issues found: 2
+────────────────────────────────────────────────────────────
+{
+  "file": "test-cases.js",
+  "line": 2,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 1,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Variable 'user_name' should use camelCase.",
+  "fix": "Rename to camelCase."
+}
+
+════════════════════════════════════════════════════════════
+  Test 8 — Multiple Issues (stress test)
+  Expected : unused var + off-by-one + loose equality + unreachable
+  Score    : 89.4%   Issues found: 7
+────────────────────────────────────────────────────────────
+{
+  "file": "test-cases.js",
+  "line": 4,
+  "column": null,
+  "type": "bug",
+  "severity": "warning",
+  "message": "Use === instead of ==.",
+  "fix": "Replace == with ==="
+}
+{
+  "file": "test-cases.js",
+  "line": 6,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 4,
+  "column": null,
+  "type": "bug",
+  "severity": "warning",
+  "message": "Use '===' instead of '==' to avoid type coercion bugs.",
+  "fix": "Replace '==' with '==='"
+}
+{
+  "file": "test-cases.js",
+  "line": 6,
+  "column": null,
+  "type": "bug",
+  "severity": "warning",
+  "message": "Unreachable code — statements after 'return' are never executed.",
+  "fix": "Remove or relocate the unreachable statements."
+}
+{
+  "file": "test-cases.js",
+  "line": 2,
+  "column": null,
+  "type": "bug",
+  "severity": "warning",
+  "message": "Variable 'unusedVar' is declared but never used.",
+  "fix": "Remove 'unusedVar' or prefix with '_' to suppress this warning."
+}
+{
+  "file": "test-cases.js",
+  "line": 3,
+  "column": null,
+  "type": "bug",
+  "severity": "warning",
+  "message": "Possible off-by-one: using '<= .length' — array index is 0-based, last valid index is length-1.",
+  "fix": "Use '< arr.length' instead of '<= arr.length'."
+}
+{
+  "file": "test-cases.js",
+  "line": 6,
+  "column": 1,
+  "type": "bug",
+  "severity": "warning",
+  "message": "Unreachable code — statements after return/break/throw are never executed.",
+  "fix": "Remove or relocate the unreachable code."
+}
+
+════════════════════════════════════════════════════════════
+  Test 9 — No Issues (clean code)
+  Expected : 0 issues
+  Score    : 94.0%   Issues found: 1
+────────────────────────────────────────────────────────────
+{
+  "file": "test-cases.js",
+  "line": 4,
+  "column": null,
+  "type": "security",
+  "severity": "error",
+  "message": "[SQL_INJECTION] Possible SQL injection.",
+  "fix": "Use parameterized queries or prepared statements."
+}
+
+════════════════════════════════════════════════════════════
+  Test 10 — Deep Nesting
+  Expected : complexity/warning: nesting > 3 levels
+  Score    : 99.9%   Issues found: 1
+────────────────────────────────────────────────────────────
+{
+  "file": "test-cases.js",
+  "line": 6,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+
+════════════════════════════════════════════════════════════
+  Test 11 — Long Function (>50 lines)
+  Expected : complexity/warning: function exceeds 50 lines
+  Score    : 93.5%   Issues found: 54
+────────────────────────────────────────────────────────────
+{
+  "file": "test-cases.js",
+  "line": 2,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 3,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 4,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 5,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 6,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 7,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 8,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 9,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 10,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 11,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 12,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 13,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 14,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 15,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 16,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 17,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 18,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 19,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 20,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 21,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 22,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 23,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 24,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 25,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 26,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 27,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 28,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 29,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 30,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 31,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 32,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 33,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 34,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 35,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 36,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 37,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 38,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 39,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 40,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 41,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 42,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 43,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 44,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 45,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 46,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 47,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 48,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 49,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 50,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 51,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 52,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 53,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 54,
+  "column": null,
+  "type": "lint",
+  "severity": "info",
+  "message": "Remove console statement before production.",
+  "fix": "No suggestion provided"
+}
+{
+  "file": "test-cases.js",
+  "line": 1,
+  "column": null,
+  "type": "complexity",
+  "severity": "warning",
+  "message": "Function 'longFunction': Function too long (>50 lines) (cyclomatic: 1, lines: 55, nesting: 0)",
+  "fix": "Refactor into smaller, focused functions."
+}
+
+════════════════════════════════════════════════════════════
+  SUMMARY
+  Total issues detected across all tests : 77
+  Tests that produced expected output    : 10 / 11
+════════════════════════════════════════════════════════════
+

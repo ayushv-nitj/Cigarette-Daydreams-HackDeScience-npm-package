@@ -21,10 +21,10 @@ import { formatCode } from "../detection/formatter";
 import { analyzeComplexity } from "../complexity/complexity";
 import { analyzeRedundancy } from "../redundancy/redundancy";
 
-import { securityRules } from "../detection/rules/security";
+
 import { runBugLintEngine } from "./bug-lint-engine";
 import { runSemgrepEngine } from "./semgrep-engine";
-import { runOsvEngine } from "./osv-engine";
+import { runTeamSecurityEngine } from "./security-adapter";
 import { ParallelStage } from "./task-runner";
 import { aggregate } from "./aggregator";
 import { score as scoreResult } from "./scoring-engine";
@@ -72,35 +72,31 @@ export async function analyze(
         runBugLintEngine(code, language)
     );
 
-    stage.add("securityRules", () => {
-        try { return securityRules(code, language); }
-        catch { return []; }
-    });
-
     stage.add("semgrepEngine", () =>
         runSemgrepEngine(code, language)
     );
 
-    stage.add("osvEngine", () =>
-        runOsvEngine(projectPath)
+    // Teammate's full security engine — static scan (SQL/XSS/secrets/cmd/path) + dependency CVE
+    stage.add("teamSecurityEngine", () =>
+        runTeamSecurityEngine(code, language, projectPath)
     );
 
-   stage.add("complexityEngine", () => {
-    try {
-        return analyzeComplexity(code, language);
-    } catch {
-        return { functions: [] };
-    }
-});
+    stage.add("complexityEngine", () => {
+        try {
+            return analyzeComplexity(code, language);
+        } catch {
+            return { functions: [] };
+        }
+    });
 
 
     stage.add("redundancyEngine", () => {
-    try {
-        return analyzeRedundancy(code, language);
-    } catch {
-        return { duplicates: [] };
-    }
-});
+        try {
+            return analyzeRedundancy(code, language);
+        } catch {
+            return { duplicates: [] };
+        }
+    });
 
     // Auto-formatter (existing formatter.ts)
     stage.add("formatter", () =>

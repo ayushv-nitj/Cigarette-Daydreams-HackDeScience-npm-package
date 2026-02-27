@@ -1,0 +1,135 @@
+
+[1m════════════════════════════════════════════════════════════════════
+  🔍 Analyzing: test-cases.js
+════════════════════════════════════════════════════════════════════[0m
+[2m  ┌─ code preview ───────────────────────────────────────────────────
+  │  // test-cases.js — Canonical test file for the code analysis pipeline
+  │  // Contains all known bug/lint/security/complexity/redundancy patterns.
+  │  // Used as:
+  │  //   node examples/analyze.js examples/test-cases.js          ← full report
+  │  //   node examples/run-tests.js                               ← structured JSON per issue
+  │  
+  │  … +136 more lines
+  └──────────────────────────────────────────────────────────────────[0m
+
+  [1mScore   : [31m34.5%[0m
+  Language: javascript  (method: extension, conf: 1.00)
+
+────────────────────────────────────────────────────────────────────
+[1m  ISSUES (39):[0m
+  [36m[info   ][0m [style      ] L18   Remove console statement before production.
+  [36m[info   ][0m [style      ] L23   Remove console statement before production.
+  [36m[info   ][0m [style      ] L26   Remove console statement before production.
+  [36m[info   ][0m [style      ] L41   Remove console statement before production.
+  [33m[warning][0m [bug        ] L44   Use === instead of ==.
+  [2m           💡  Replace == with ===[0m
+  [33m[warning][0m [bug        ] L46   Use === instead of ==.
+  [2m           💡  Replace == with ===[0m
+  [36m[info   ][0m [style      ] L47   Remove console statement before production.
+  [36m[info   ][0m [style      ] L53   Remove console statement before production.
+  [36m[info   ][0m [style      ] L56   Prefer const or let over var.
+  [2m           💡  Use const for immutable bindings, let for mutable.[0m
+  [33m[warning][0m [bug        ] L60   Use === instead of ==.
+  [2m           💡  Replace == with ===[0m
+  [36m[info   ][0m [style      ] L62   Remove console statement before production.
+  [36m[info   ][0m [style      ] L84   Remove console statement before production.
+  [36m[info   ][0m [style      ] L94   Remove console statement before production.
+  [36m[info   ][0m [style      ] L95   Remove console statement before production.
+  [36m[info   ][0m [style      ] L96   Remove console statement before production.
+  [36m[info   ][0m [style      ] L97   Remove console statement before production.
+  [36m[info   ][0m [style      ] L98   Remove console statement before production.
+  [36m[info   ][0m [style      ] L99   Remove console statement before production.
+  [36m[info   ][0m [style      ] L100  Remove console statement before production.
+  [36m[info   ][0m [style      ] L101  Remove console statement before production.
+  [36m[info   ][0m [style      ] L102  Remove console statement before production.
+  [36m[info   ][0m [style      ] L103  Remove console statement before production.
+  [36m[info   ][0m [style      ] L104  Remove console statement before production.
+  [33m[warning][0m [bug        ] L26   Unreachable code — statements after 'return' are never executed.
+  [2m           💡  Remove or relocate the unreachable statements.[0m
+  [33m[warning][0m [bug        ] L40   Variable 'count' shadows a declaration in an outer scope.
+  [2m           💡  Rename 'count' to avoid shadowing.[0m
+  [33m[warning][0m [bug        ] L46   Use '===' instead of '==' to avoid type coercion bugs.
+  [2m           💡  Replace '==' with '==='[0m
+  [36m[info   ][0m [style      ] L52   Variable 'user_name' should use camelCase.
+  [2m           💡  Rename to camelCase.[0m
+  [33m[warning][0m [bug        ] L60   Use '===' instead of '==' to avoid type coercion bugs.
+  [2m           💡  Replace '==' with '==='[0m
+  [33m[warning][0m [bug        ] L62   Unreachable code — statements after 'return' are never executed.
+  [2m           💡  Remove or relocate the unreachable statements.[0m
+  [36m[info   ][0m [style      ] L116  Constant 'api_key' should use UPPER_CASE or camelCase rather than mixed/other casing.
+  [2m           💡  Use UPPER_CASE for true constants, camelCase for computed values.[0m
+  [33m[warning][0m [bug        ] L32   Variable 'result' is declared but never used.
+  [2m           💡  Remove 'result' or prefix with '_' to suppress this warning.[0m
+  [33m[warning][0m [bug        ] L58   Variable 'unusedVar' is declared but never used.
+  [2m           💡  Remove 'unusedVar' or prefix with '_' to suppress this warning.[0m
+  [33m[warning][0m [bug        ] L116  Variable 'api_key' is declared but never used.
+  [2m           💡  Remove 'api_key' or prefix with '_' to suppress this warning.[0m
+  [31m[error  ][0m [bug        ] L12   Passing literal 'null' to 'printName()' — the function may dereference it without a null check.
+  [2m           💡  Add a null guard inside 'printName': if (!param) return; or use optional chaining.[0m
+  [33m[warning][0m [bug        ] L15   Possible off-by-one: using '<= .length' — array index is 0-based, last valid index is length-1.
+  [2m           💡  Use '< arr.length' instead of '<= arr.length'.[0m
+  [33m[warning][0m [bug        ] L17   Possible off-by-one: using '<= .length' — array index is 0-based, last valid index is length-1.
+  [2m           💡  Use '< arr.length' instead of '<= arr.length'.[0m
+  [33m[warning][0m [bug        ] L26   Unreachable code — statements after return/break/throw are never executed.
+  [2m           💡  Remove or relocate the unreachable code.[0m
+  [33m[warning][0m [bug        ] L59   Possible off-by-one: using '<= .length' — array index is 0-based, last valid index is length-1.
+  [2m           💡  Use '< arr.length' instead of '<= arr.length'.[0m
+  [33m[warning][0m [bug        ] L62   Unreachable code — statements after return/break/throw are never executed.
+  [2m           💡  Remove or relocate the unreachable code.[0m
+
+────────────────────────────────────────────────────────────────────
+[1m  SECURITY (8):[0m
+  [31m[error  ][0m L116  [Semgrep] Hardcoded credential in 'api_key'. Use environment variables instead (process.env.MY_SECRET).
+  [2m           💡  Rule: dist.engine.js-hardcoded-secret[0m
+  [31m[error  ][0m L116  [Semgrep] Hardcoded credential in 'api_key'. Use environment variables instead.
+  [2m           💡  Rule: dist.engine.js-hardcoded-secret-var[0m
+  [31m[error  ][0m L127  [Semgrep] Setting innerHTML with dynamic content can cause XSS. Use textContent or DOMPurify.
+  [2m           💡  Rule: dist.engine.js-inner-html[0m
+  [31m[error  ][0m L72   [SQL_INJECTION] Possible SQL injection.
+  [2m           💡  Use parameterized queries or prepared statements.[0m
+  [31m[error  ][0m L110  [SQL_INJECTION] Possible SQL injection.
+  [2m           💡  Use parameterized queries or prepared statements.[0m
+  [31m[error  ][0m L121  [COMMAND_INJECTION] Possible command injection via string concatenation.
+  [2m           💡  Avoid string concatenation in system commands. Use argument arrays or strict validation.[0m
+  [31m[error  ][0m L134  [SQL_INJECTION] Possible SQL injection.
+  [2m           💡  Use parameterized queries or prepared statements.[0m
+  [31m[error  ][0m L139  [SQL_INJECTION] Possible SQL injection.
+  [2m           💡  Use parameterized queries or prepared statements.[0m
+
+────────────────────────────────────────────────────────────────────
+[1m  COMPLEXITY FUNCTIONS (14):[0m
+  ✓ printName             L9    cyclomatic:1  lines:3  nesting:0
+  ✓ printArray            L16   cyclomatic:2  lines:5  nesting:1
+  ✓ test                  L24   cyclomatic:1  lines:4  nesting:0
+  ✓ calculate             L31   cyclomatic:1  lines:4  nesting:0
+  ✓ update                L39   cyclomatic:1  lines:4  nesting:0
+  ✓ testMultiple          L57   cyclomatic:3  lines:9  nesting:2
+  ✓ sum                   L69   cyclomatic:2  lines:7  nesting:1
+  ✓ deep                  L79   cyclomatic:5  lines:11  nesting:4
+  ✓ longFunction          L93   cyclomatic:1  lines:13  nesting:0
+  ✓ getUser               L109  cyclomatic:1  lines:4  nesting:0
+  ✓ runCmd                L120  cyclomatic:1  lines:3  nesting:0
+  ✓ renderContent         L126  cyclomatic:1  lines:3  nesting:0
+  ✓ duplicateBlockA       L132  cyclomatic:2  lines:5  nesting:1
+  ✓ duplicateBlockB       L137  cyclomatic:2  lines:5  nesting:1
+
+────────────────────────────────────────────────────────────────────
+[1m  PENALTY BREAKDOWN:[0m
+  bug          █████████████████████████████ 95.0%
+  security     ██████████████████████████████ 100.0%
+  complexity    0.0%
+  redundancy    0.0%
+  style        ███████ 22.0%
+
+────────────────────────────────────────────────────────────────────
+[1m  STAGE TIMING:[0m
+  baseAnalyzer          [2m26ms[0m
+  bugLintEngine         [2m26ms[0m
+  semgrepEngine         [2m1807ms[0m
+  teamSecurityEngine    [2m26ms[0m
+  complexityEngine      [2m26ms[0m
+  redundancyEngine      [2m26ms[0m
+  formatter             [2m26ms[0m
+
+[1m════════════════════════════════════════════════════════════════════[0m
+
