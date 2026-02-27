@@ -7,6 +7,8 @@
 
 import type { DiffLine, DiffHunk, ParsedDiff, DiffStats } from '../types';
 
+export type { ParsedDiff, DiffHunk, DiffLine, DiffStats } from '../types';
+
 // ─── Internal edit types ────────────────────────────────────────────────────
 
 type EditType = 'equal' | 'insert' | 'delete';
