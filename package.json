@@ -6,7 +6,8 @@
   "types": "dist/index.d.ts",
   "type": "commonjs",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test": "node src/test/detection.test.js"
   },
   "repository": {
     "type": "git",
