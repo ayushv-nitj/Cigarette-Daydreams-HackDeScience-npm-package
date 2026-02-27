@@ -1,0 +1,16 @@
+{
+  "lodash": {
+    "4.17.15": {
+      "severity": "high",
+      "message": "Prototype Pollution vulnerability.",
+      "fixed": "4.17.21"
+    }
+  },
+  "express": {
+    "4.16.0": {
+      "severity": "medium",
+      "message": "Denial of Service vulnerability.",
+      "fixed": "4.18.2"
+    }
+  }
+}

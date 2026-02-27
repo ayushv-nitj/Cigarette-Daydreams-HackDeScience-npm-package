@@ -103,6 +103,7 @@ export async function analyzeCode(code: string): Promise<Report> {
   };
 }
 
+// ── Utilities 
 export function version() {
   return "1.0.0";
 }

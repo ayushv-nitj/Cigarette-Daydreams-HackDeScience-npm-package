@@ -1,2 +1,8 @@
 dist/
 node_modules/
+demo/
+tests/
+temp-node-bad.js
+test-c-bad.c
+test-command-bad.js
+test-path-bad.js
