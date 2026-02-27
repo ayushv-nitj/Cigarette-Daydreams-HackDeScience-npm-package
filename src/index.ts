@@ -171,6 +171,7 @@ export async function formatFile(
    ANALYZE FILE (Detection + Scoring)
 ───────────────────────────────────────────────────────────── */
 
+//basic analyzeFile function for testing that accepts source code + optional filename and returns as analysisreport with a .detection field at top level
 export function analyzeFile(
   code: string,
   options: { filename?: string; weights?: Partial<AnalysisWeights> } = {}
