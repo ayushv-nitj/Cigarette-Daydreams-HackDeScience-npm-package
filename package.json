@@ -6,7 +6,7 @@
   "types": "dist/index.d.ts",
   "type": "commonjs",
   "scripts": {
-    "build": "tsc && mkdir -p src/dist/engine && cp src/engine/semgrep-rules.yml src/dist/engine/semgrep-rules.yml",
+    "build": "tsc",
     "test": "node src/test/detection.test.js"
   },
   "repository": {
@@ -18,9 +18,11 @@
     "dist"
   ],
   "devDependencies": {
+    "@types/axios": "^0.9.36",
     "@types/babel__traverse": "^7.28.0",
     "@types/diff": "^7.0.2",
     "@types/node": "^25.3.2",
+    "copyfiles": "^2.4.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   },
