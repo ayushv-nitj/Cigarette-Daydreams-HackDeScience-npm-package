@@ -25,25 +25,21 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   },
-  "dependencies": {
-    "@babel/parser": "^7.29.0",
-<<<<<<< HEAD
-    "@babel/traverse": "^7.29.0"
-=======
-    "@babel/traverse": "^7.29.0",
-    "@babel/types": "^7.29.0",
-    "axios": "^1.13.6",
-    "clang-format": "^1.8.0",
-    "diff": "^8.0.3",
-    "prettier": "^3.8.1",
-    "prettier-plugin-java": "^2.8.1",
-    "tree-sitter-c": "^0.24.1",
-    "tree-sitter-cpp": "^0.23.4",
-    "tree-sitter-java": "^0.23.5",
-    "tree-sitter-javascript": "^0.25.0",
-    "tree-sitter-python": "^0.25.0",
-    "tree-sitter-typescript": "^0.23.2",
-    "web-tree-sitter": "^0.26.6"
->>>>>>> 588cd97bac28968856a4798c1558467249613d9a
-  }
+"dependencies": {
+  "@babel/parser": "^7.29.0",
+  "@babel/traverse": "^7.29.0",
+  "@babel/types": "^7.29.0",
+  "axios": "^1.13.6",
+  "clang-format": "^1.8.0",
+  "diff": "^8.0.3",
+  "prettier": "^3.8.1",
+  "prettier-plugin-java": "^2.8.1",
+  "tree-sitter-c": "^0.24.1",
+  "tree-sitter-cpp": "^0.23.4",
+  "tree-sitter-java": "^0.23.5",
+  "tree-sitter-javascript": "^0.25.0",
+  "tree-sitter-python": "^0.25.0",
+  "tree-sitter-typescript": "^0.23.2",
+  "web-tree-sitter": "^0.26.6"
+}
 }
