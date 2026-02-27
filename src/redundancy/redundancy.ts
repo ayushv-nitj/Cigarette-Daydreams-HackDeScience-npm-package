@@ -13,153 +13,169 @@ export interface RedundancyResult {
 }
 
 function normalizeCode(code: string): string {
-  return code.replace(/\s+/g, " ").trim();
+  return code.replace(/\s+/g, "").trim();
 }
 
 function hashCode(code: string): string {
   return crypto.createHash("sha256").update(code).digest("hex");
 }
 
-export function analyzeRedundancy(code: string): RedundancyResult {
-  const ast = parse(code, {
-    sourceType: "module",
-    plugins: ["typescript", "jsx"]
-  });
+export function analyzeRedundancy(
+  code: string,
+  language?: string
+): RedundancyResult {
 
-  const functionMap = new Map<string, { name: string; line: number }>();
-  const duplicates: DuplicateFunction[] = [];
+  // ---------- JS / TS ----------
+  if (language === "javascript" || language === "typescript") {
 
-  traverse(ast, {
-  FunctionDeclaration(path) {
-    processFunction(path.node, path);
-  },
-  FunctionExpression(path) {
-    processFunction(path.node, path);
-  },
-  ArrowFunctionExpression(path) {
-    processFunction(path.node, path);
-  }
-});
-
-function processFunction(node: any, path: any) {
-  let rawFunction = "";
-
-  if (
-    node.body &&
-    typeof node.body.start === "number" &&
-    typeof node.body.end === "number"
-  ) {
-    rawFunction = code.slice(node.body.start, node.body.end);
-  }
-
-  const normalized = normalizeCode(rawFunction);
-  const hash = hashCode(normalized);
-
-  let name = "anonymous";
-
-  if (node.id && node.id.name) {
-    name = node.id.name;
-  }
-
-  if (
-    path.parent &&
-    path.parent.type === "VariableDeclarator" &&
-    path.parent.id &&
-    path.parent.id.name
-  ) {
-    name = path.parent.id.name;
-  }
-
-  const line = node.loc?.start.line ?? 0;
-
-  if (functionMap.has(hash)) {
-    const original = functionMap.get(hash)!;
-
-    // Prevent self-duplicate
-    if (original.name !== name) {
-      duplicates.push({
-        name,
-        line,
-        duplicateOf: original.name
-      });
-    }
-  } else {
-    functionMap.set(hash, { name, line });
-  }
-}
-
-// --------- INTELLIGENT BLOCK SEQUENCE DETECTION ---------
-
-const MIN_SEQUENCE = 3;
-
-const allBlocks: {
-  line: number;
-  statements: string[];
-}[] = [];
-
-traverse(ast, {
-  BlockStatement(path) {
-    const statements = path.node.body;
-
-    const normalizedStatements = statements.map((stmt: any) => {
-      if (
-        typeof stmt.start === "number" &&
-        typeof stmt.end === "number"
-      ) {
-        const raw = code.slice(stmt.start, stmt.end);
-        return normalizeCode(raw);
-      }
-      return "";
+    const ast = parse(code, {
+      sourceType: "module",
+      plugins: ["typescript", "jsx"]
     });
 
-    const startLine = path.node.loc?.start.line ?? 0;
+    const functionMap = new Map<string, { name: string; line: number }>();
+    const duplicates: DuplicateFunction[] = [];
 
-    allBlocks.push({
+    traverse(ast, {
+      Function(path) {
+        const node = path.node;
+
+        if (!node.body?.start || !node.body?.end) return;
+
+        const rawFunction =
+          code.slice(node.body.start, node.body.end);
+
+        const normalized = normalizeCode(rawFunction);
+        const hash = hashCode(normalized);
+
+        let name = "anonymous";
+        if ((node as any).id?.name) name = (node as any).id.name;
+
+        const line = node.loc?.start.line ?? 0;
+
+        if (functionMap.has(hash)) {
+          const original = functionMap.get(hash)!;
+          if (original.name !== name) {
+            duplicates.push({
+              name,
+              line,
+              duplicateOf: original.name
+            });
+          }
+        } else {
+          functionMap.set(hash, { name, line });
+        }
+      }
+    });
+
+    return { duplicates };
+  }
+
+ // ---------- GENERIC (Python + C/C++/Java) ----------
+
+const lines = code.split("\n");
+const functionMap = new Map<string, { name: string; line: number }>();
+const duplicates: DuplicateFunction[] = [];
+
+for (let i = 0; i < lines.length; i++) {
+
+  // -------- Python --------
+  if (language === "python") {
+    const match = lines[i].match(/^def\s+([a-zA-Z0-9_]+)\s*\(/);
+    if (!match) continue;
+
+    const name = match[1];
+    const startLine = i + 1;
+    const body: string[] = [];
+
+    const baseIndent =
+      lines[i].match(/^(\s*)/)?.[1].length ?? 0;
+
+    i++;
+
+    while (i < lines.length) {
+      const current = lines[i];
+
+      if (current.trim() === "") {
+        i++;
+        continue;
+      }
+
+      const indent =
+        current.match(/^(\s*)/)?.[1].length ?? 0;
+
+      if (indent <= baseIndent) break;
+
+      body.push(current.trim());
+      i++;
+    }
+
+    const normalized = normalizeCode(body.join(""));
+    const hash = hashCode(normalized);
+
+    if (functionMap.has(hash)) {
+      const original = functionMap.get(hash)!;
+      if (original.name !== name) {
+        duplicates.push({
+          name,
+          line: startLine,
+          duplicateOf: original.name
+        });
+      }
+    } else {
+      functionMap.set(hash, { name, line: startLine });
+    }
+
+    i--;
+    continue;
+  }
+
+  // -------- C / C++ / Java --------
+const match = lines[i].match(
+  /^[a-zA-Z0-9_<>\*\s]+\s+([a-zA-Z0-9_]+)\s*\(.*\)\s*\{/
+);
+if (!match) continue;
+
+const name = match[1];
+const startLine = i + 1;
+
+let braceDepth = 1;
+let bodyLines: string[] = [];
+
+i++;
+
+while (i < lines.length && braceDepth > 0) {
+  const current = lines[i];
+
+  if (current.includes("{")) braceDepth++;
+  if (current.includes("}")) braceDepth--;
+
+  // Only store actual body lines, not closing brace
+  if (braceDepth > 0) {
+    bodyLines.push(current.trim());
+  }
+
+  i++;
+}
+
+const normalized = normalizeCode(bodyLines.join(""));
+const hash = hashCode(normalized);
+
+if (functionMap.has(hash)) {
+  const original = functionMap.get(hash)!;
+  if (original.name !== name) {
+    duplicates.push({
+      name,
       line: startLine,
-      statements: normalizedStatements
+      duplicateOf: original.name
     });
   }
-});
-
-// Compare every pair of blocks
-for (let i = 0; i < allBlocks.length; i++) {
-  for (let j = i + 1; j < allBlocks.length; j++) {
-    const blockA = allBlocks[i];
-    const blockB = allBlocks[j];
-
-    const lenA = blockA.statements.length;
-    const lenB = blockB.statements.length;
-
-    for (let a = 0; a < lenA; a++) {
-      for (let b = 0; b < lenB; b++) {
-        let matchLength = 0;
-
-        while (
-          a + matchLength < lenA &&
-          b + matchLength < lenB &&
-          blockA.statements[a + matchLength] ===
-            blockB.statements[b + matchLength]
-        ) {
-          matchLength++;
-        }
-
-        if (matchLength >= MIN_SEQUENCE) {
-          const lineA = blockA.line + a;
-          const lineB = blockB.line + b;
-
-          duplicates.push({
-            name: `Repeated block starting line ${lineB}`,
-            line: lineB,
-            duplicateOf: `Block starting line ${lineA}`
-          });
-
-          // Skip ahead to avoid overlapping matches
-          a += matchLength - 1;
-          break;
-        }
-      }
-    }
-  }
+} else {
+  functionMap.set(hash, { name, line: startLine });
 }
+
+    i--;
+  }
+
   return { duplicates };
 }

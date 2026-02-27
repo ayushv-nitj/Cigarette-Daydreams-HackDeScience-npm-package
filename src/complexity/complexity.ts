@@ -15,99 +15,221 @@ export interface ComplexityResult {
   functions: FunctionComplexity[];
 }
 
-export function analyzeComplexity(code: string): ComplexityResult {
-  const ast = parse(code, {
-    sourceType: "module",
-    plugins: ["typescript", "jsx"],
+/* ---------- GENERIC FUNCTION EXTRACTION ---------- */
+
+function extractGenericFunctions(
+  code: string,
+  language?: string
+) {
+  const lines = code.split("\n");
+  const functions: {
+    name: string;
+    startLine: number;
+    body: string[];
+  }[] = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    // Python
+    if (language === "python") {
+      const match = line.match(/^def\s+([a-zA-Z0-9_]+)\s*\(/);
+      if (!match) continue;
+
+      const name = match[1];
+      const startLine = i + 1;
+      const body: string[] = [];
+      const baseIndent =
+        line.match(/^(\s*)/)?.[1].length ?? 0;
+
+      i++;
+
+      while (i < lines.length) {
+        const current = lines[i];
+        if (current.trim() === "") {
+          i++;
+          continue;
+        }
+
+        const indent =
+          current.match(/^(\s*)/)?.[1].length ?? 0;
+
+        if (indent <= baseIndent) break;
+
+        body.push(current.trim());
+        i++;
+      }
+
+      functions.push({ name, startLine, body });
+      i--;
+    }
+
+    // C / C++ / Java
+    else {
+      const match = line.match(
+        /^[a-zA-Z0-9_<>\*\s]+\s+([a-zA-Z0-9_]+)\s*\(.*\)\s*\{/
+      );
+      if (!match) continue;
+
+      const name = match[1];
+      const startLine = i + 1;
+      const body: string[] = [line];
+      let braceDepth = 1;
+      i++;
+
+      while (i < lines.length && braceDepth > 0) {
+        const current = lines[i];
+        body.push(current);
+
+        if (current.includes("{")) braceDepth++;
+        if (current.includes("}")) braceDepth--;
+        i++;
+      }
+
+      functions.push({ name, startLine, body });
+      i--;
+    }
+  }
+
+  return functions;
+}
+
+function computeGenericComplexity(body: string[]) {
+  let complexity = 1;
+  let nesting = 0;
+  let maxNesting = 0;
+
+  const controlRegex = /\b(if|elif|else if|for|while|switch|case|catch|except|try)\b/;
+  const logicalRegex = /(&&|\|\|)/;
+
+  body.forEach((line) => {
+    const trimmed = line.trim();
+
+    // Cyclomatic increment
+    if (controlRegex.test(trimmed)) {
+      complexity++;
+      nesting++;
+      maxNesting = Math.max(maxNesting, nesting);
+    }
+
+    if (logicalRegex.test(trimmed)) {
+      const matches = trimmed.match(logicalRegex);
+      if (matches) complexity += matches.length;
+    }
+
+    // Python block end via indentation drop handled externally
+    // C/Java block end via brace
+    if (trimmed.includes("}")) {
+      nesting = Math.max(0, nesting - 1);
+    }
   });
 
-  const functions: FunctionComplexity[] = [];
+  return { complexity, maxNesting };
+}
 
-  traverse(ast, {
-    Function(path: NodePath<t.Function>) {
-      const node = path.node;
+/* ---------- MAIN ---------- */
 
-      let name = "anonymous";
+export function analyzeComplexity(
+  code: string,
+  language?: string
+): ComplexityResult {
 
-      // FunctionDeclaration name
-      if (t.isFunctionDeclaration(node) && node.id?.name) {
-        name = node.id.name;
-      }
+  if (language === "javascript" || language === "typescript") {
+    const ast = parse(code, {
+      sourceType: "module",
+      plugins: ["typescript", "jsx"],
+    });
 
-      // VariableDeclarator (arrow function / function expression)
-      else if (
-        path.parentPath &&
-        t.isVariableDeclarator(path.parentPath.node) &&
-        t.isIdentifier(path.parentPath.node.id)
-      ) {
-        name = path.parentPath.node.id.name;
-      }
+    const functions: FunctionComplexity[] = [];
 
-      const startLine = node.loc?.start.line ?? 0;
-      const endLine = node.loc?.end.line ?? 0;
-      const length = endLine - startLine + 1;
+    traverse(ast, {
+      Function(path: NodePath<t.Function>) {
+        const node = path.node;
 
-      let complexity = 1;
-      let maxNesting = 0;
-      let currentNesting = 0;
+        let name = "anonymous";
 
-      const controlTypes = new Set([
-        "IfStatement",
-        "ForStatement",
-        "WhileStatement",
-        "DoWhileStatement",
-        "SwitchStatement",
-        "CatchClause",
-      ]);
+        if (t.isFunctionDeclaration(node) && node.id?.name) {
+          name = node.id.name;
+        } else if (
+          path.parentPath &&
+          t.isVariableDeclarator(path.parentPath.node) &&
+          t.isIdentifier(path.parentPath.node.id)
+        ) {
+          name = path.parentPath.node.id.name;
+        }
 
-      path.traverse({
-        enter(innerPath: NodePath) {
-          if (controlTypes.has(innerPath.node.type)) {
-            currentNesting++;
-            maxNesting = Math.max(maxNesting, currentNesting);
-            complexity++;
-          }
+        const startLine = node.loc?.start.line ?? 0;
+        const endLine = node.loc?.end.line ?? 0;
+        const length = endLine - startLine + 1;
 
-          if (
-            t.isLogicalExpression(innerPath.node) &&
-            (innerPath.node.operator === "&&" ||
-              innerPath.node.operator === "||")
-          ) {
-            complexity++;
-          }
-        },
+        let complexity = 1;
+        let maxNesting = 0;
+        let currentNesting = 0;
 
-        exit(innerPath: NodePath) {
-          if (controlTypes.has(innerPath.node.type)) {
-            currentNesting--;
-          }
-        },
-      });
+        const controlTypes = new Set([
+          "IfStatement",
+          "ForStatement",
+          "WhileStatement",
+          "DoWhileStatement",
+          "SwitchStatement",
+          "CatchClause",
+        ]);
 
-      const warnings: string[] = [];
+        path.traverse({
+          enter(innerPath: NodePath) {
+            if (controlTypes.has(innerPath.node.type)) {
+              currentNesting++;
+              maxNesting = Math.max(maxNesting, currentNesting);
+              complexity++;
+            }
 
-      if (complexity > 10) {
-        warnings.push("High cyclomatic complexity (>10)");
-      }
+            if (
+              t.isLogicalExpression(innerPath.node) &&
+              (innerPath.node.operator === "&&" ||
+                innerPath.node.operator === "||")
+            ) {
+              complexity++;
+            }
+          },
+          exit(innerPath: NodePath) {
+            if (controlTypes.has(innerPath.node.type)) {
+              currentNesting--;
+            }
+          },
+        });
 
-      if (length > 50) {
-        warnings.push("Function too long (>50 lines)");
-      }
+        functions.push({
+          name,
+          line: startLine,
+          cyclomaticComplexity: complexity,
+          length,
+          nestingDepth: maxNesting,
+          warnings: [],
+        });
+      },
+    });
 
-      if (maxNesting > 5) {
-        warnings.push("Deep nesting detected (>5)");
-      }
+    return { functions };
+  }
 
-      functions.push({
-        name,
-        line: startLine,
-        cyclomaticComplexity: complexity,
-        length,
-        nestingDepth: maxNesting,
-        warnings,
-      });
-    },
-  });
+  // ---------- GENERIC LANGUAGES ----------
+  const genericFunctions =
+    extractGenericFunctions(code, language);
 
-  return { functions };
+  const result: FunctionComplexity[] =
+    genericFunctions.map((fn) => {
+      const metrics =
+        computeGenericComplexity(fn.body);
+
+      return {
+        name: fn.name,
+        line: fn.startLine,
+        cyclomaticComplexity: metrics.complexity,
+        length: fn.body.length,
+        nestingDepth: metrics.maxNesting,
+        warnings: [],
+      };
+    });
+
+  return { functions: result };
 }

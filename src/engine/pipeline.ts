@@ -85,22 +85,22 @@ export async function analyze(
         runOsvEngine(projectPath)
     );
 
-    stage.add("complexityEngine", () => {
-        try {
-            return analyzeComplexity(code);
-        } catch {
-            return { functions: [] };
-        }
-    });
+   stage.add("complexityEngine", () => {
+    try {
+        return analyzeComplexity(code, language);
+    } catch {
+        return { functions: [] };
+    }
+});
 
 
     stage.add("redundancyEngine", () => {
-        try {
-            return analyzeRedundancy(code);
-        } catch {
-            return { duplicates: [] };
-        }
-    });
+    try {
+        return analyzeRedundancy(code, language);
+    } catch {
+        return { duplicates: [] };
+    }
+});
 
     // Auto-formatter (existing formatter.ts)
     stage.add("formatter", () =>
