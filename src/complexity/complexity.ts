@@ -1,5 +1,6 @@
 import { parse } from "@babel/parser";
-import traverse from "@babel/traverse";
+import traverse, { NodePath } from "@babel/traverse";
+import * as t from "@babel/types";
 
 export interface FunctionComplexity {
   name: string;
@@ -17,79 +18,71 @@ export interface ComplexityResult {
 export function analyzeComplexity(code: string): ComplexityResult {
   const ast = parse(code, {
     sourceType: "module",
-    plugins: ["typescript", "jsx"]
+    plugins: ["typescript", "jsx"],
   });
 
   const functions: FunctionComplexity[] = [];
 
   traverse(ast, {
-    Function(path) {
+    Function(path: NodePath<t.Function>) {
       const node = path.node;
 
       let name = "anonymous";
 
-if ((node as any).id && (node as any).id.name) {
-  name = (node as any).id.name;
-} else if (
-  path.parentPath &&
-  path.parentPath.node.type === "VariableDeclarator" &&
-  (path.parentPath.node as any).id &&
-  (path.parentPath.node as any).id.name
-) {
-  name = (path.parentPath.node as any).id.name;
-}
+      // FunctionDeclaration name
+      if (t.isFunctionDeclaration(node) && node.id?.name) {
+        name = node.id.name;
+      }
 
-      const startLine = node.loc?.start.line || 0;
-      const endLine = node.loc?.end.line || 0;
+      // VariableDeclarator (arrow function / function expression)
+      else if (
+        path.parentPath &&
+        t.isVariableDeclarator(path.parentPath.node) &&
+        t.isIdentifier(path.parentPath.node.id)
+      ) {
+        name = path.parentPath.node.id.name;
+      }
+
+      const startLine = node.loc?.start.line ?? 0;
+      const endLine = node.loc?.end.line ?? 0;
       const length = endLine - startLine + 1;
 
-      let complexity = 1; // base complexity
+      let complexity = 1;
       let maxNesting = 0;
+      let currentNesting = 0;
 
-     let currentNesting = 0;
+      const controlTypes = new Set([
+        "IfStatement",
+        "ForStatement",
+        "WhileStatement",
+        "DoWhileStatement",
+        "SwitchStatement",
+        "CatchClause",
+      ]);
 
-path.traverse({
-  enter(innerPath) {
-    const controlTypes = [
-      "IfStatement",
-      "ForStatement",
-      "WhileStatement",
-      "DoWhileStatement",
-      "SwitchStatement",
-      "CatchClause"
-    ];
+      path.traverse({
+        enter(innerPath: NodePath) {
+          if (controlTypes.has(innerPath.node.type)) {
+            currentNesting++;
+            maxNesting = Math.max(maxNesting, currentNesting);
+            complexity++;
+          }
 
-    if (controlTypes.includes(innerPath.node.type)) {
-      currentNesting++;
-      if (currentNesting > maxNesting) {
-        maxNesting = currentNesting;
-      }
-      complexity++;
-    }
+          if (
+            t.isLogicalExpression(innerPath.node) &&
+            (innerPath.node.operator === "&&" ||
+              innerPath.node.operator === "||")
+          ) {
+            complexity++;
+          }
+        },
 
-    if (
-      innerPath.node.type === "LogicalExpression" &&
-      (innerPath.node.operator === "&&" ||
-        innerPath.node.operator === "||")
-    ) {
-      complexity++;
-    }
-  },
-  exit(innerPath) {
-    const controlTypes = [
-      "IfStatement",
-      "ForStatement",
-      "WhileStatement",
-      "DoWhileStatement",
-      "SwitchStatement",
-      "CatchClause"
-    ];
-
-    if (controlTypes.includes(innerPath.node.type)) {
-      currentNesting--;
-    }
-  }
-});
+        exit(innerPath: NodePath) {
+          if (controlTypes.has(innerPath.node.type)) {
+            currentNesting--;
+          }
+        },
+      });
 
       const warnings: string[] = [];
 
@@ -101,8 +94,8 @@ path.traverse({
         warnings.push("Function too long (>50 lines)");
       }
 
-      if (maxNesting > 20) {
-        warnings.push("Deep nesting detected");
+      if (maxNesting > 5) {
+        warnings.push("Deep nesting detected (>5)");
       }
 
       functions.push({
@@ -111,9 +104,9 @@ path.traverse({
         cyclomaticComplexity: complexity,
         length,
         nestingDepth: maxNesting,
-        warnings
+        warnings,
       });
-    }
+    },
   });
 
   return { functions };
