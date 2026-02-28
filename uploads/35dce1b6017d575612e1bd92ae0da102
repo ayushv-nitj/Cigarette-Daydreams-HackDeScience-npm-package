@@ -1,0 +1,22 @@
+// This file is intentionally vulnerable for security scanner testing.
+
+function handleRequest(req) {
+  const id = req.query.id;
+
+  // SQL Injection
+  const db = {
+    query: function(q) { console.log(q); }
+  };
+  db.query("SELECT * FROM users WHERE id=" + id);
+
+  // Hardcoded Secret
+  const API_KEY = "sk_test_1234567890123456";
+
+  // XSS
+  const element = {
+    innerHTML: ""
+  };
+  element.innerHTML = id;
+}
+
+handleRequest({ query: { id: "1" } });
