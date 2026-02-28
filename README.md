@@ -20,6 +20,214 @@ npm install cigarette-daydreams-hackdescience-npm-package
 
 ## 🚀 Quick Start
 
+---
+
+## 🧪 Backend Demo (Live Terminal Test)
+
+> 📦 npm: [cigarette-daydreams-hackdescience-npm-package](https://www.npmjs.com/package/cigarette-daydreams-hackdescience-npm-package)
+
+### Setup
+
+```bash
+mkdir reviewer-demo && cd reviewer-demo
+npm init -y
+npm install cigarette-daydreams-hackdescience-npm-package
+```
+
+Create an `index.js` file with the snippet below, then run:
+
+```bash
+node index.js
+```
+
+### `index.js`
+
+```js
+const myPackage = require("cigarette-daydreams-hackdescience-npm-package");
+
+async function run() {
+  const result = await myPackage.analyze(`
+password = "admin123"  # hardcoded
+
+user = input("Enter username: ")
+pwd = input("Enter password: ")
+
+if user == "admin":
+    if pwd == password:
+        if len(pwd) > 0:  # redundant
+            print("Access granted")
+    else:
+        print("Wrong password:", pwd)  # info leak
+else:
+    print("Unknown user")
+
+for i in range(3):
+    print("Login attempt")  # useless loop
+  `);
+
+  console.log(result);
+}
+
+run();
+```
+
+**Expected issues detected:** Plaintext hardcoded password · Info leakage in error output · Redundant length check · Unnecessary loop
+
+---
+
+### 🔁 Sample Snippets — Swap Into `index.js` to Test Other Languages
+
+<details>
+<summary>1️⃣ JavaScript (Node.js)</summary>
+
+```js
+const password = "admin123"; // hardcoded secret
+const express = require("express");
+const app = express();
+
+app.get("/login", (req, res) => {
+    let user = req.query.user;
+    let pass = req.query.pass;
+
+    if (user == "admin") {
+        if (pass == password) {
+            if (pass.length > 0) { // redundant check
+                res.send("Welcome Admin");
+            }
+        } else {
+            res.send("Wrong password: " + pass); // info leak
+        }
+    }
+});
+
+app.listen(3000);
+```
+
+**Issues:** Hardcoded password · Password exposed in error message · Nested condition complexity · No rate limiting
+
+</details>
+
+<details>
+<summary>2️⃣ C</summary>
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+int main() {
+    char password[10];
+    char input[50];
+
+    strcpy(password, "admin123"); // hardcoded
+    printf("Enter password: ");
+    gets(input); // unsafe
+
+    if(strcmp(input, password) == 0) {
+        printf("Access granted\n");
+    } else {
+        printf("Wrong password: %s\n", input); // info leak
+    }
+
+    return 0;
+}
+```
+
+**Issues:** `gets()` → buffer overflow · Hardcoded password · Input echoing sensitive data
+
+</details>
+
+<details>
+<summary>3️⃣ C++</summary>
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    string password = "admin123"; // hardcoded
+    string input;
+
+    cout << "Enter password: ";
+    cin >> input;
+
+    if(input == password) {
+        for(int i = 0; i < input.length(); i++) {
+            if(input[i] == password[i]) {
+                cout << "Match\n"; // redundant loop
+            }
+        }
+    } else {
+        cout << "Wrong password: " << input << endl; // leak
+    }
+
+    return 0;
+}
+```
+
+**Issues:** Hardcoded secret · Redundant loop · Leaking input · No hashing
+
+</details>
+
+<details>
+<summary>4️⃣ Python</summary>
+
+```python
+password = "admin123"  # hardcoded
+
+user = input("Enter username: ")
+pwd = input("Enter password: ")
+
+if user == "admin":
+    if pwd == password:
+        if len(pwd) > 0:  # redundant
+            print("Access granted")
+    else:
+        print("Wrong password:", pwd)  # info leak
+else:
+    print("Unknown user")
+
+for i in range(3):
+    print("Login attempt")  # useless loop
+```
+
+**Issues:** Plaintext password · Info leakage · Redundant checks · Unnecessary loop
+
+</details>
+
+<details>
+<summary>5️⃣ Java</summary>
+
+```java
+import java.util.Scanner;
+
+public class Login {
+    public static void main(String[] args) {
+        String password = "admin123"; // hardcoded
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter password: ");
+        String input = sc.nextLine();
+
+        if(input.equals(password)) {
+            for(int i=0; i<input.length(); i++) {
+                if(input.charAt(i) == password.charAt(i)) {
+                    System.out.println("Match"); // redundant
+                }
+            }
+        } else {
+            System.out.println("Wrong password: " + input); // leak
+        }
+
+        sc.close();
+    }
+}
+```
+
+**Issues:** Hardcoded secret · Redundant character-by-character loop · Password leaked in output
+
+</details>
+
+
 ### Basic Usage
 
 ```javascript
